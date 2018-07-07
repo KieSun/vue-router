@@ -8,9 +8,12 @@ const positionStore = Object.create(null)
 
 export function setupScroll () {
   // Fix for #1585 for Firefox
+  // 监听 popstate 事件
   window.history.replaceState({ key: getStateKey() }, '')
   window.addEventListener('popstate', e => {
+    // 在 positionStore 对象中以 key: value 形式保存当前页面滚动位置
     saveScrollPosition()
+    // 将 key 储存 返回时使用
     if (e.state && e.state.key) {
       setStateKey(e.state.key)
     }

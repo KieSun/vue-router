@@ -11,15 +11,19 @@ export class HTML5History extends History {
   constructor (router: Router, base: ?string) {
     super(router, base)
 
+    // 判断是否配置了 scrollBehavior 滚动行为 && 是否支持 History 模式
     const expectScroll = router.options.scrollBehavior
     const supportsScroll = supportsPushState && expectScroll
 
+    // 支持则监听 popstate 事件 储存 pageOffset 坐标
     if (supportsScroll) {
       setupScroll()
     }
 
+    // 处理 pathname 去除 base
     const initLocation = getLocation(this.base)
     window.addEventListener('popstate', e => {
+      // TODO:
       const current = this.current
 
       // Avoiding first `popstate` event dispatched in some browsers but first
@@ -28,7 +32,6 @@ export class HTML5History extends History {
       if (this.current === START && location === initLocation) {
         return
       }
-
       this.transitionTo(location, route => {
         if (supportsScroll) {
           handleScroll(router, route, current, true)
@@ -41,6 +44,9 @@ export class HTML5History extends History {
     window.history.go(n)
   }
 
+  // 不方便用 router-link 的时候 用这个作为跳转
+  // 调用继承与 History transitionTo
+  // 跳转基本都调用 transitionTo
   push (location: RawLocation, onComplete?: Function, onAbort?: Function) {
     const { current: fromRoute } = this
     this.transitionTo(location, route => {

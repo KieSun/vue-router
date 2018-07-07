@@ -31,7 +31,6 @@ export default class VueRouter {
   beforeHooks: Array<?NavigationGuard>;
   resolveHooks: Array<?NavigationGuard>;
   afterHooks: Array<?AfterNavigationHook>;
-
   constructor (options: RouterOptions = {}) {
     this.app = null
     this.apps = []
@@ -39,9 +38,18 @@ export default class VueRouter {
     this.beforeHooks = []
     this.resolveHooks = []
     this.afterHooks = []
+    /**
+     *  createMatcher
+     *    return {
+     *      match,
+     *      addRoutes
+     *    }
+     */
     this.matcher = createMatcher(options.routes || [], this)
 
+    // 默认 hash 模式
     let mode = options.mode || 'hash'
+    // 使用 history 模式 但是设备不支持 尝试使用 hash 模式
     this.fallback = mode === 'history' && !supportsPushState && options.fallback !== false
     if (this.fallback) {
       mode = 'hash'
@@ -51,6 +59,8 @@ export default class VueRouter {
     }
     this.mode = mode
 
+    // 根据 mode 实例化 history
+    // options.base 是实例化 VueRouter 时的 __dirname
     switch (mode) {
       case 'history':
         this.history = new HTML5History(this, options.base)
@@ -63,6 +73,7 @@ export default class VueRouter {
         break
       default:
         if (process.env.NODE_ENV !== 'production') {
+          // 断言
           assert(false, `invalid mode: ${mode}`)
         }
     }
@@ -87,6 +98,7 @@ export default class VueRouter {
       `before creating root instance.`
     )
 
+    // TODO
     this.apps.push(app)
 
     // main app already initialized.
@@ -98,6 +110,7 @@ export default class VueRouter {
 
     const history = this.history
 
+    //  HTML5History HashHistory 做些处理
     if (history instanceof HTML5History) {
       history.transitionTo(history.getCurrentLocation())
     } else if (history instanceof HashHistory) {
@@ -179,13 +192,13 @@ export default class VueRouter {
     current?: Route,
     append?: boolean
   ): {
-    location: Location,
-    route: Route,
-    href: string,
-    // for backwards compat
-    normalizedTo: Location,
-    resolved: Route
-  } {
+      location: Location,
+      route: Route,
+      href: string,
+      // for backwards compat
+      normalizedTo: Location,
+      resolved: Route
+    } {
     const location = normalizeLocation(
       to,
       current || this.history.current,

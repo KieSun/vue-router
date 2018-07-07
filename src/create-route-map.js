@@ -10,10 +10,10 @@ export function createRouteMap (
   oldPathMap?: Dictionary<RouteRecord>,
   oldNameMap?: Dictionary<RouteRecord>
 ): {
-  pathList: Array<string>;
-  pathMap: Dictionary<RouteRecord>;
-  nameMap: Dictionary<RouteRecord>;
-} {
+    pathList: Array<string>;
+    pathMap: Dictionary<RouteRecord>;
+    nameMap: Dictionary<RouteRecord>;
+  } {
   // the path list is used to control path matching priority
   const pathList: Array<string> = oldPathList || []
   // $flow-disable-line
@@ -21,6 +21,11 @@ export function createRouteMap (
   // $flow-disable-line
   const nameMap: Dictionary<RouteRecord> = oldNameMap || Object.create(null)
 
+  // routes: [
+  //   { path: '/', component: Home },
+  //   { path: '/foo', component: Foo },
+  //   { path: '/bar', component: Bar }
+  // ]
   routes.forEach(route => {
     addRouteRecord(pathList, pathMap, nameMap, route)
   })
@@ -104,6 +109,7 @@ function addRouteRecord (
         )
       }
     }
+    // 嵌套路由递归调用
     route.children.forEach(child => {
       const childMatchAs = matchAs
         ? cleanPath(`${matchAs}/${child.path}`)
