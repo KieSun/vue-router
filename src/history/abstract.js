@@ -29,7 +29,7 @@ export class AbstractHistory extends History {
   }
 
   go (n: number) {
-    const targetIndex = this.index + n
+       const targetIndex = this.index + n
     if (targetIndex < 0 || targetIndex >= this.stack.length) {
       return
     }

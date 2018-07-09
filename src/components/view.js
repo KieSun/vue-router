@@ -60,6 +60,11 @@ export default {
         (!val && current === vm)
       ) {
         matched.instances[name] = val
+      } if (
+        (val && current !== vm) ||
+        (!val && current === vm)
+      ) {
+        matched.instances[name] = val
       }
     }
 

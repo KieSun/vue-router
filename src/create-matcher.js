@@ -30,7 +30,6 @@ export function createMatcher (
   ): Route {
     const location = normalizeLocation(raw, currentRoute, false, router)
     const { name } = location
-
     if (name) {
       const record = nameMap[name]
       if (process.env.NODE_ENV !== 'production') {
