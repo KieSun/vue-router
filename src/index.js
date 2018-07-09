@@ -1,7 +1,7 @@
 /* @flow */
 
 import { install } from './install'
-import { START } from './util/route'
+import { START } from './util/route' 
 import { assert } from './util/warn'
 import { inBrowser } from './util/dom'
 import { cleanPath } from './util/path'
