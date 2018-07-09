@@ -21,11 +21,7 @@ export function createRouteMap (
   // $flow-disable-line
   const nameMap: Dictionary<RouteRecord> = oldNameMap || Object.create(null)
 
-  // routes: [
-  //   { path: '/', component: Home },
-  //   { path: '/foo', component: Foo },
-  //   { path: '/bar', component: Bar }
-  // ]
+  // 循环遍历 routes
   routes.forEach(route => {
     addRouteRecord(pathList, pathMap, nameMap, route)
   })
@@ -56,6 +52,7 @@ function addRouteRecord (
 ) {
   const { path, name } = route
   if (process.env.NODE_ENV !== 'production') {
+    // 断言 必须有 path 不然报错
     assert(path != null, `"path" is required in a route configuration.`)
     assert(
       typeof route.component !== 'string',
@@ -64,6 +61,7 @@ function addRouteRecord (
     )
   }
 
+  // 编译正则的选项
   const pathToRegexpOptions: PathToRegexpOptions = route.pathToRegexpOptions || {}
   const normalizedPath = normalizePath(
     path,
@@ -75,6 +73,7 @@ function addRouteRecord (
     pathToRegexpOptions.sensitive = route.caseSensitive
   }
 
+  // 路由记录模板
   const record: RouteRecord = {
     path: normalizedPath,
     regex: compileRouteRegex(normalizedPath, pathToRegexpOptions),
@@ -93,6 +92,7 @@ function addRouteRecord (
         : { default: route.props }
   }
 
+  // 判断是否是嵌套路由
   if (route.children) {
     // Warn if route is named, does not redirect and has a default child route.
     // If users navigate to this route by name, the default child will
@@ -118,6 +118,7 @@ function addRouteRecord (
     })
   }
 
+  // 别名处理
   if (route.alias !== undefined) {
     const aliases = Array.isArray(route.alias)
       ? route.alias
@@ -139,11 +140,13 @@ function addRouteRecord (
     })
   }
 
+  // 以 key: value 储存 防止 path 重复
   if (!pathMap[record.path]) {
     pathList.push(record.path)
     pathMap[record.path] = record
   }
 
+  // 以 key: value 储存 防止 name 重复
   if (name) {
     if (!nameMap[name]) {
       nameMap[name] = record
@@ -157,6 +160,7 @@ function addRouteRecord (
   }
 }
 
+// 将路径转化为正则
 function compileRouteRegex (path: string, pathToRegexpOptions: PathToRegexpOptions): RouteRegExp {
   const regex = Regexp(path, [], pathToRegexpOptions)
   if (process.env.NODE_ENV !== 'production') {
@@ -169,9 +173,11 @@ function compileRouteRegex (path: string, pathToRegexpOptions: PathToRegexpOptio
   return regex
 }
 
+// 处理 path
 function normalizePath (path: string, parent?: RouteRecord, strict?: boolean): string {
   if (!strict) path = path.replace(/\/$/, '')
   if (path[0] === '/') return path
   if (parent == null) return path
+  // 将 '//' 替换成 '/'
   return cleanPath(`${parent.path}/${path}`)
 }

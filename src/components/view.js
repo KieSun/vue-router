@@ -65,7 +65,7 @@ export default {
 
     // also register instance in prepatch hook
     // in case the same component instance is reused across different routes
-    ;(data.hook || (data.hook = {})).prepatch = (_, vnode) => {
+    ; (data.hook || (data.hook = {})).prepatch = (_, vnode) => {
       matched.instances[name] = vnode.componentInstance
     }
 

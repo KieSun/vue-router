@@ -45,7 +45,7 @@ export class HTML5History extends History {
   }
 
   // 不方便用 router-link 的时候 用这个作为跳转
-  // 调用继承与 History transitionTo
+  // 调用继承 History transitionTo
   // 跳转基本都调用 transitionTo
   push (location: RawLocation, onComplete?: Function, onAbort?: Function) {
     const { current: fromRoute } = this

@@ -7,7 +7,10 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
 // 2. Define route components
-const Home = { template: '<div>home</div>' }
+const Home = {
+  template: '<div>home</div>',
+  name: 'templateHome'
+}
 const Foo = { template: '<div>foo</div>' }
 const Bar = { template: '<div>bar</div>' }
 
@@ -16,9 +19,25 @@ const router = new VueRouter({
   mode: 'history',
   base: __dirname,
   routes: [
-    { path: '/', component: Home },
-    { path: '/foo', component: Foo },
-    { path: '/bar', component: Bar }
+    {
+      path: '/',
+      name: 'Home',
+      component: Home
+    },
+    {
+      path: '',
+      name: 'lalla'
+    },
+    {
+      path: '/foo',
+      component: Foo,
+      name: 'Foo'
+    },
+    {
+      path: '/bar',
+      component: Bar,
+      name: 'Bar'
+    }
   ]
 })
 

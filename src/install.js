@@ -8,14 +8,17 @@ export function install (Vue) {
   if (install.installed && _Vue === Vue) return
   install.installed = true
 
+  // 这里使用一个内部变量来保存 Vue 实例
+  // 是为了为了避免 依赖 Vue
   _Vue = Vue
 
   // 简单工具函数，判断不为 undefined
   const isDef = v => v !== undefined
 
-  // TODO:
   const registerInstance = (vm, callVal) => {
     let i = vm.$options._parentVnode
+    // registerRouteInstance 是在 RouterView 赋值的
+    // 在满足条件的情况将 i 赋值为 i.registerRouteInstance
     if (isDef(i) && isDef(i = i.data) && isDef(i = i.registerRouteInstance)) {
       i(vm, callVal)
     }
@@ -24,14 +27,14 @@ export function install (Vue) {
   // 全局混合策略 影响后面的vue实例 mixin 生命周期钩子将优先执行
   Vue.mixin({
     beforeCreate () {
-      console.log('this.$options.router', this.$options.router)
-      // 判断是否有 VueRouter 实例，有就复制 并执行 init 方法
+      // 判断是否有 VueRouter 实例，有就赋值 并执行 init 方法
       if (isDef(this.$options.router)) {
         this._routerRoot = this
         this._router = this.$options.router
         this._router.init(this)
         // 使用 Vue.util 暴露的 defineReactive 建立响应式的 _route 对象
-        // TODO: Vue.util 哪里暴露的 ？
+        // Vue.util 是在 initGlobalAPI 方法中暴露的
+        // vue/src/core/global-api/index.js
         Vue.util.defineReactive(this, '_route', this._router.history.current)
       } else {
         // 没有就找父级原素以及顶级原素

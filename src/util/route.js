@@ -16,7 +16,7 @@ export function createRoute (
   let query: any = location.query || {}
   try {
     query = clone(query)
-  } catch (e) {}
+  } catch (e) { }
 
   const route: Route = {
     name: location.name || (record && record.name),
@@ -26,8 +26,10 @@ export function createRoute (
     query,
     params: location.params || {},
     fullPath: getFullPath(location, stringifyQuery),
+    // 用数组记录 当前 route 以及它的上级 route
     matched: record ? formatMatch(record) : []
   }
+  console.log('createRoute', route)
   if (redirectedFrom) {
     route.redirectedFrom = getFullPath(redirectedFrom, stringifyQuery)
   }

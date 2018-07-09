@@ -42,14 +42,14 @@ export default class VueRouter {
      *  createMatcher
      *    return {
      *      match,
-     *      addRoutes
+     *      addRoutes 动态添加更多的路由规则
      *    }
      */
     this.matcher = createMatcher(options.routes || [], this)
 
     // 默认 hash 模式
     let mode = options.mode || 'hash'
-    // 使用 history 模式 但是设备不支持 尝试使用 hash 模式
+    // 使用 history 模式 如果设备不支持 尝试使用 hash 模式
     this.fallback = mode === 'history' && !supportsPushState && options.fallback !== false
     if (this.fallback) {
       mode = 'hash'
@@ -98,7 +98,7 @@ export default class VueRouter {
       `before creating root instance.`
     )
 
-    // TODO
+    // TODO 是为了保存多个router实例 ？ 什么场景需要
     this.apps.push(app)
 
     // main app already initialized.
@@ -131,14 +131,17 @@ export default class VueRouter {
     })
   }
 
+  // 俗称全局前置守卫 一般用作拦截登录
   beforeEach (fn: Function): Function {
     return registerHook(this.beforeHooks, fn)
   }
 
+  // 俗称全局解析守卫
   beforeResolve (fn: Function): Function {
     return registerHook(this.resolveHooks, fn)
   }
 
+  // 俗称全局后置钩子
   afterEach (fn: Function): Function {
     return registerHook(this.afterHooks, fn)
   }
@@ -219,6 +222,9 @@ export default class VueRouter {
     }
   }
 
+  // 引用 createMatcher return 的 matcher 方法
+  // 动态添加更多的路由规则
+
   addRoutes (routes: Array<RouteConfig>) {
     this.matcher.addRoutes(routes)
     if (this.history.current !== START) {
@@ -235,14 +241,17 @@ function registerHook (list: Array<any>, fn: Function): Function {
   }
 }
 
+// 不同 mode 的 href 处理
 function createHref (base: string, fullPath: string, mode) {
   var path = mode === 'hash' ? '#' + fullPath : fullPath
   return base ? cleanPath(base + '/' + path) : path
 }
 
+// 插件暴露的 install 方法
 VueRouter.install = install
 VueRouter.version = '__VERSION__'
 
+// 在 浏览器环境 和 有 window 挂载 Vue 实例情况下 自动使用插件
 if (inBrowser && window.Vue) {
   window.Vue.use(VueRouter)
 }
