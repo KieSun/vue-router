@@ -18,7 +18,8 @@ export function install (Vue) {
   const registerInstance = (vm, callVal) => {
     let i = vm.$options._parentVnode
     // registerRouteInstance 是在 RouterView 赋值的
-    // 在满足条件的情况将 i 赋值为 i.registerRouteInstance
+    // 所以说 只有组件是 RouterView 才执行
+    // 在满足条件的情况将 i 赋值为 i.data.registerRouteInstance 并调用
     if (isDef(i) && isDef(i = i.data) && isDef(i = i.registerRouteInstance)) {
       i(vm, callVal)
     }
@@ -27,7 +28,8 @@ export function install (Vue) {
   // 全局混合策略 影响后面的vue实例 mixin 生命周期钩子将优先执行
   Vue.mixin({
     beforeCreate () {
-      // 判断是否有 VueRouter 实例，有就赋值 并执行 init 方法
+      // 判断是否有 router 实例，
+      // 有就是根组件 执行 init 方法
       if (isDef(this.$options.router)) {
         this._routerRoot = this
         this._router = this.$options.router
@@ -37,7 +39,7 @@ export function install (Vue) {
         // vue/src/core/global-api/index.js
         Vue.util.defineReactive(this, '_route', this._router.history.current)
       } else {
-        // 没有就找父级原素以及顶级原素
+        // 没有就找父级、父元素的 _routerRoot
         this._routerRoot = (this.$parent && this.$parent._routerRoot) || this
       }
       registerInstance(this, this)
@@ -47,7 +49,7 @@ export function install (Vue) {
     }
   })
 
-  // 给原型添加 $router $route
+  // 给原型添加 $router $route 代理到 this._routerRoot._router
   Object.defineProperty(Vue.prototype, '$router', {
     get () { return this._routerRoot._router }
   })

@@ -22,8 +22,8 @@ export class HTML5History extends History {
 
     // 处理 pathname 去除 base
     const initLocation = getLocation(this.base)
+    // 监听浏览器的 popstate 跳转
     window.addEventListener('popstate', e => {
-      // TODO:
       const current = this.current
 
       // Avoiding first `popstate` event dispatched in some browsers but first

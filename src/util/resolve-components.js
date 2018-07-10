@@ -9,6 +9,8 @@ export function resolveAsyncComponents (matched: Array<RouteRecord>): Function {
     let pending = 0
     let error = null
 
+    // 拿到 resolveQueue 处理后的 activated 数组
+    // 提取组件部分合并成数组， 循环处理异步组件
     flatMapComponents(matched, (def, _, match, key) => {
       // if it's a function and doesn't have cid attached,
       // assume it's an async component resolve function.

@@ -41,7 +41,7 @@ export default class VueRouter {
     /**
      *  createMatcher
      *    return {
-     *      match,
+     *      match, 匹配函数
      *      addRoutes 动态添加更多的路由规则
      *    }
      */
@@ -110,7 +110,7 @@ export default class VueRouter {
 
     const history = this.history
 
-    //  HTML5History HashHistory 做些处理
+    // 判断属于那个实例 做些处理
     if (history instanceof HTML5History) {
       history.transitionTo(history.getCurrentLocation())
     } else if (history instanceof HashHistory) {
@@ -131,17 +131,17 @@ export default class VueRouter {
     })
   }
 
-  // 俗称全局前置守卫 一般用作拦截登录
+  // 全局前置守卫 一般用作拦截登录
   beforeEach (fn: Function): Function {
     return registerHook(this.beforeHooks, fn)
   }
 
-  // 俗称全局解析守卫
+  // 全局解析守卫
   beforeResolve (fn: Function): Function {
     return registerHook(this.resolveHooks, fn)
   }
 
-  // 俗称全局后置钩子
+  // 全局后置钩子
   afterEach (fn: Function): Function {
     return registerHook(this.afterHooks, fn)
   }
@@ -224,7 +224,6 @@ export default class VueRouter {
 
   // 引用 createMatcher return 的 matcher 方法
   // 动态添加更多的路由规则
-
   addRoutes (routes: Array<RouteConfig>) {
     this.matcher.addRoutes(routes)
     if (this.history.current !== START) {
@@ -233,6 +232,7 @@ export default class VueRouter {
   }
 }
 
+// 将 回调 push 到对应的守卫钩子任务队列
 function registerHook (list: Array<any>, fn: Function): Function {
   list.push(fn)
   return () => {

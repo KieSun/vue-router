@@ -30,7 +30,7 @@ export class History {
   // +ensureURL: (push?: boolean) => void;
   // +getCurrentLocation: () => string;
 
-  constructor(router: Router, base: ?string) {
+  constructor (router: Router, base: ?string) {
     this.router = router
     this.base = normalizeBase(base)
     // start with a route object that stands for "nowhere"
@@ -42,11 +42,11 @@ export class History {
     this.errorCbs = []
   }
 
-  listen(cb: Function) {
+  listen (cb: Function) {
     this.cb = cb
   }
 
-  onReady(cb: Function, errorCb: ?Function) {
+  onReady (cb: Function, errorCb: ?Function) {
     if (this.ready) {
       cb()
     } else {
@@ -57,12 +57,12 @@ export class History {
     }
   }
 
-  onError(errorCb: Function) {
+  onError (errorCb: Function) {
     this.errorCbs.push(errorCb)
   }
 
   // 跳转核心处理
-  transitionTo(location: RawLocation, onComplete?: Function, onAbort?: Function) {
+  transitionTo (location: RawLocation, onComplete?: Function, onAbort?: Function) {
     // 得到 match 处理后的 route
     const route = this.router.match(location, this.current)
     this.confirmTransition(route, () => {
@@ -86,7 +86,7 @@ export class History {
     })
   }
 
-  confirmTransition(route: Route, onComplete: Function, onAbort?: Function) {
+  confirmTransition (route: Route, onComplete: Function, onAbort?: Function) {
     const current = this.current
     const abort = err => {
       if (isError(err)) {
@@ -111,29 +111,33 @@ export class History {
 
     // 将当前的 matched 与 跳转的 matched 比较
     // matched 是在 createRoute 中增加
-    // 用来数组记录 当前 route 以及它的上级 route
-    // 用 resolveQueue
+    // 用来数组记录当前 route 以及它的上级 route
+    // 用 resolveQueue 来做做新旧对比 比较后返回3种路由状态的数组
     const {
       updated,
       deactivated,
       activated
     } = resolveQueue(this.current.matched, route.matched)
 
-    // 提取 守卫的钩子函数 将任务队列合并
+    // 提取守卫的钩子函数 将任务队列合并
     const queue: Array<?NavigationGuard> = [].concat(
       // in-component leave guards
+      // 注册组件内的 beforeRouteLeave 钩子函数
       extractLeaveGuards(deactivated),
       // global before hooks
       this.router.beforeHooks,
       // in-component update hooks
+      // 注册组件内的 beforeRouteUpdate 钩子函数
       extractUpdateHooks(updated),
       // in-config enter guards
       activated.map(m => m.beforeEnter),
       // async components
+      // 异步组件处理
       resolveAsyncComponents(activated)
     )
 
     this.pending = route
+
     const iterator = (hook: NavigationGuard, next) => {
       if (this.pending !== route) {
         return abort()
@@ -152,6 +156,7 @@ export class History {
             ))
           ) {
             // next('/') or next({ path: '/' }) -> redirect
+            // 重定向操作
             abort()
             if (typeof to === 'object' && to.replace) {
               this.replace(to)
@@ -168,11 +173,13 @@ export class History {
       }
     }
 
+    // 执行合并后的任务队列
     runQueue(queue, iterator, () => {
       const postEnterCbs = []
       const isValid = () => this.current === route
       // wait until async components are resolved before
       // extracting in-component enter guards
+      // 拿到组件 beforeRouteEnter 钩子函数 合并任务队列
       const enterGuards = extractEnterGuards(activated, postEnterCbs, isValid)
       const queue = enterGuards.concat(this.router.resolveHooks)
       runQueue(queue, iterator, () => {
@@ -191,7 +198,7 @@ export class History {
   }
 
   // 更新当前 route 并且执行 afterHooks 回调
-  updateRoute(route: Route) {
+  updateRoute (route: Route) {
     const prev = this.current
     this.current = route
     this.cb && this.cb(route)
@@ -201,7 +208,7 @@ export class History {
   }
 }
 
-function normalizeBase(base: ?string): string {
+function normalizeBase (base: ?string): string {
   if (!base) {
     if (inBrowser) {
       // respect <base> tag
@@ -221,7 +228,7 @@ function normalizeBase(base: ?string): string {
   return base.replace(/\/$/, '')
 }
 
-function resolveQueue(
+function resolveQueue (
   current: Array<RouteRecord>,
   next: Array<RouteRecord>
 ): {
@@ -243,7 +250,7 @@ function resolveQueue(
   }
 }
 
-function extractGuards(
+function extractGuards (
   records: Array<RouteRecord>,
   name: string,
   bind: Function,
@@ -260,7 +267,7 @@ function extractGuards(
   return flatten(reverse ? guards.reverse() : guards)
 }
 
-function extractGuard(
+function extractGuard (
   def: Object | Function,
   key: string
 ): NavigationGuard | Array<NavigationGuard> {
@@ -271,23 +278,23 @@ function extractGuard(
   return def.options[key]
 }
 
-function extractLeaveGuards(deactivated: Array<RouteRecord>): Array<?Function> {
+function extractLeaveGuards (deactivated: Array<RouteRecord>): Array<?Function> {
   return extractGuards(deactivated, 'beforeRouteLeave', bindGuard, true)
 }
 
-function extractUpdateHooks(updated: Array<RouteRecord>): Array<?Function> {
+function extractUpdateHooks (updated: Array<RouteRecord>): Array<?Function> {
   return extractGuards(updated, 'beforeRouteUpdate', bindGuard)
 }
 
-function bindGuard(guard: NavigationGuard, instance: ?_Vue): ?NavigationGuard {
+function bindGuard (guard: NavigationGuard, instance: ?_Vue): ?NavigationGuard {
   if (instance) {
-    return function boundRouteGuard() {
+    return function boundRouteGuard () {
       return guard.apply(instance, arguments)
     }
   }
 }
 
-function extractEnterGuards(
+function extractEnterGuards (
   activated: Array<RouteRecord>,
   cbs: Array<Function>,
   isValid: () => boolean
@@ -297,14 +304,14 @@ function extractEnterGuards(
   })
 }
 
-function bindEnterGuard(
+function bindEnterGuard (
   guard: NavigationGuard,
   match: RouteRecord,
   key: string,
   cbs: Array<Function>,
   isValid: () => boolean
 ): NavigationGuard {
-  return function routeEnterGuard(to, from, next) {
+  return function routeEnterGuard (to, from, next) {
     return guard(to, from, cb => {
       next(cb)
       if (typeof cb === 'function') {
@@ -321,7 +328,7 @@ function bindEnterGuard(
   }
 }
 
-function poll(
+function poll (
   cb: any, // somehow flow cannot infer this is a function
   instances: Object,
   key: string,

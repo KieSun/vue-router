@@ -23,6 +23,7 @@ export default {
 
     // determine current view depth, also check to see if the tree
     // has been toggled inactive but kept-alive.
+    // 深度记录
     let depth = 0
     let inactive = false
     while (parent && parent._routerRoot !== parent) {
@@ -48,10 +49,13 @@ export default {
       return h()
     }
 
+    // 根据 name 拿到缓存的 component
     const component = cache[name] = matched.components[name]
 
     // attach instance registration hook
     // this will be called in the instance's injected lifecycle hooks
+    // 将传入的 val 以 name 为 key 保存到 matched.instances
+    // TODO: 是在什么时候挂载这个实例
     data.registerRouteInstance = (vm, val) => {
       // val could be undefined for unregistration
       const current = matched.instances[name]
