@@ -73,7 +73,6 @@ export default {
     }
 
     const on = { click: guardEvent }
-    console.log(this.event)
     // 可配置的监听 event 事件 可以是数组
     // 循环添加事件监听
     if (Array.isArray(this.event)) {

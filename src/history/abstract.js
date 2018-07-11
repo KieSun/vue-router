@@ -9,6 +9,8 @@ export class AbstractHistory extends History {
 
   constructor (router: Router, base: ?string) {
     super(router, base)
+    // 用数组模拟浏览器记录
+    // 基本都是对数组的操作
     this.stack = []
     this.index = -1
   }

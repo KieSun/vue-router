@@ -11,9 +11,11 @@ export class HashHistory extends History {
   constructor (router: Router, base: ?string, fallback: boolean) {
     super(router, base)
     // check history fallback deeplinking
+    // 检查 是否是强制使用 hash 模式
     if (fallback && checkFallback(this.base)) {
       return
     }
+    // 保证 path 以 '/' 开头
     ensureSlash()
   }
 
@@ -80,6 +82,7 @@ export class HashHistory extends History {
 
 function checkFallback (base) {
   const location = getLocation(base)
+  // 处理不是 '/#' 开头的
   if (!/^\/#/.test(location)) {
     window.location.replace(
       cleanPath(base + '/#' + location)
@@ -97,6 +100,7 @@ function ensureSlash (): boolean {
   return false
 }
 
+// 获取 hash 后的地址
 export function getHash (): string {
   // We can't use window.location.hash here because it's not
   // consistent across browsers - Firefox will pre-decode it!

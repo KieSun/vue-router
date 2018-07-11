@@ -22,6 +22,7 @@ export function createRouteMap (
   const nameMap: Dictionary<RouteRecord> = oldNameMap || Object.create(null)
 
   // 循环遍历 routes
+  // 处理 pathList pathMap nameMap
   routes.forEach(route => {
     addRouteRecord(pathList, pathMap, nameMap, route)
   })

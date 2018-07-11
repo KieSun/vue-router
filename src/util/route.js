@@ -29,7 +29,6 @@ export function createRoute (
     // 用数组记录 当前 route 以及它的上级 route
     matched: record ? formatMatch(record) : []
   }
-  console.log('createRoute', route)
   if (redirectedFrom) {
     route.redirectedFrom = getFullPath(redirectedFrom, stringifyQuery)
   }

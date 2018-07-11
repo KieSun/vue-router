@@ -30,6 +30,15 @@ export function createMatcher (
     currentRoute?: Route,
     redirectedFrom?: Location
   ): Route {
+    /**
+     * normalizeLocation
+     *  return {
+     *    _normalized: true,
+     *    path || name,
+     *    query,
+     *    hash
+     *  }
+     */
     const location = normalizeLocation(raw, currentRoute, false, router)
     const { name } = location
 
@@ -161,6 +170,7 @@ export function createMatcher (
     location: Location,
     redirectedFrom?: Location
   ): Route {
+    // 不同 类型 router 处理
     if (record && record.redirect) {
       return redirect(record, redirectedFrom || location)
     }

@@ -66,8 +66,13 @@ export class History {
     // 得到 match 处理后的 route
     const route = this.router.match(location, this.current)
     this.confirmTransition(route, () => {
+      // 更新当前 route
       this.updateRoute(route)
+      // 路由更新后的回调
+      // 就是 HashHistory类的 setupListeners
+      // 做了滚动处理 hash 事件监听
       onComplete && onComplete(route)
+      // 更新 url （在子类申明的方法）
       this.ensureURL()
 
       // fire ready cbs once
@@ -112,7 +117,7 @@ export class History {
     // 将当前的 matched 与 跳转的 matched 比较
     // matched 是在 createRoute 中增加
     // 用来数组记录当前 route 以及它的上级 route
-    // 用 resolveQueue 来做做新旧对比 比较后返回3种路由状态的数组
+    // 用 resolveQueue 来做做新旧对比 比较后返回需要更新、激活、卸载3种路由状态的数组
     const {
       updated,
       deactivated,
@@ -122,12 +127,12 @@ export class History {
     // 提取守卫的钩子函数 将任务队列合并
     const queue: Array<?NavigationGuard> = [].concat(
       // in-component leave guards
-      // 注册组件内的 beforeRouteLeave 钩子函数
+      // 获得组件内的 beforeRouteLeave 钩子函数
       extractLeaveGuards(deactivated),
       // global before hooks
       this.router.beforeHooks,
       // in-component update hooks
-      // 注册组件内的 beforeRouteUpdate 钩子函数
+      // 获得组件内的 beforeRouteUpdate 钩子函数
       extractUpdateHooks(updated),
       // in-config enter guards
       activated.map(m => m.beforeEnter),

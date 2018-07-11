@@ -41,7 +41,7 @@ export default class VueRouter {
     /**
      *  createMatcher
      *    return {
-     *      match, 匹配函数
+     *      match, 匹配函数 通过传入的 routes 生产各种路由表
      *      addRoutes 动态添加更多的路由规则
      *    }
      */
@@ -49,11 +49,13 @@ export default class VueRouter {
 
     // 默认 hash 模式
     let mode = options.mode || 'hash'
-    // 使用 history 模式 如果设备不支持 尝试使用 hash 模式
+    // 使用 history 模式 如果设备不支持 强制使用 hash 模式
     this.fallback = mode === 'history' && !supportsPushState && options.fallback !== false
     if (this.fallback) {
       mode = 'hash'
     }
+    // 不是浏览器环境环境 强制使用 abstract 模式
+    // 使用场景: Node 服务器
     if (!inBrowser) {
       mode = 'abstract'
     }
@@ -66,6 +68,8 @@ export default class VueRouter {
         this.history = new HTML5History(this, options.base)
         break
       case 'hash':
+        // 这里把上面的 fallback 作为参数传入
+        // HashHistory 中会做处理
         this.history = new HashHistory(this, options.base, this.fallback)
         break
       case 'abstract':
@@ -87,6 +91,7 @@ export default class VueRouter {
     return this.matcher.match(raw, current, redirectedFrom)
   }
 
+  // 获取当前路由信息
   get currentRoute (): ?Route {
     return this.history && this.history.current
   }
@@ -97,8 +102,6 @@ export default class VueRouter {
       `not installed. Make sure to call \`Vue.use(VueRouter)\` ` +
       `before creating root instance.`
     )
-
-    // TODO 是为了保存多个router实例 ？ 什么场景需要
     this.apps.push(app)
 
     // main app already initialized.
@@ -110,20 +113,25 @@ export default class VueRouter {
 
     const history = this.history
 
-    // 判断属于那个实例 做些处理
+    // 对 HTML5History HashHistory 2种实例做特殊处理
     if (history instanceof HTML5History) {
       history.transitionTo(history.getCurrentLocation())
     } else if (history instanceof HashHistory) {
       const setupHashListener = () => {
         history.setupListeners()
       }
+      // 在 route 更新后再添加事件监听
+      // issues #725
       history.transitionTo(
+        // HashHistory 类的 getHash 方法， 获取 hash 后的 url
         history.getCurrentLocation(),
         setupHashListener,
         setupHashListener
       )
     }
 
+    // issues #1110 #1108
+    // 主要是为了修复多个vue实例 route 状态共享的问题
     history.listen(route => {
       this.apps.forEach((app) => {
         app._route = route
@@ -146,6 +154,7 @@ export default class VueRouter {
     return registerHook(this.afterHooks, fn)
   }
 
+  // 一下都是调用 history 类的方法
   onReady (cb: Function, errorCb?: Function) {
     this.history.onReady(cb, errorCb)
   }
@@ -174,7 +183,10 @@ export default class VueRouter {
     this.go(1)
   }
 
+  // 返回目标位置或是当前路由匹配的组件数组
   getMatchedComponents (to?: RawLocation | Route): Array<any> {
+    // 有 to 就取 to.matched 没有 to.matched 就调用 this.resolve(to) 得到 route
+    // 没有就是当前路由记录
     const route: any = to
       ? to.matched
         ? to
@@ -183,6 +195,7 @@ export default class VueRouter {
     if (!route) {
       return []
     }
+    // 从 route.matched 路由记录表拿到对应的 component 以数组返回
     return [].concat.apply([], route.matched.map(m => {
       return Object.keys(m.components).map(key => {
         return m.components[key]
@@ -232,7 +245,7 @@ export default class VueRouter {
   }
 }
 
-// 将 回调 push 到对应的守卫钩子任务队列
+// 将回调 push 到对应的守卫钩子任务队列
 function registerHook (list: Array<any>, fn: Function): Function {
   list.push(fn)
   return () => {
