@@ -28,7 +28,7 @@ export default {
       default: 'click'
     }
   },
-  render (h: Function) {
+  render(h: Function) {
     const router = this.$router
     const current = this.$route
     // 解析跳转目标路径
@@ -91,7 +91,7 @@ export default {
       data.on = on
       data.attrs = { href }
     } else {
-      // 不是则递归向下寻找，找到就添加 href 点击事件
+      // 不是则递归向下寻找，找到就添加 href、监听事件
       // find the first <a> child and apply listener and href
       const a = findAnchor(this.$slots.default)
       if (a) {
@@ -102,7 +102,7 @@ export default {
         const aAttrs = a.data.attrs = extend({}, a.data.attrs)
         aAttrs.href = href
       } else {
-        // 找不到就给自己添加 href 点击事件
+        // 找不到就给自己添加 href、监听事件
         // doesn't have <a> child, apply listener to self
         data.on = on
       }
@@ -114,7 +114,7 @@ export default {
   }
 }
 
-function guardEvent (e) {
+function guardEvent(e) {
   // don't redirect with control keys
   if (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) return
   // don't redirect when preventDefault called
@@ -134,7 +134,7 @@ function guardEvent (e) {
 }
 
 // 递归找到锚点并返回
-function findAnchor (children) {
+function findAnchor(children) {
   if (children) {
     let child
     for (let i = 0; i < children.length; i++) {

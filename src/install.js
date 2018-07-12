@@ -39,7 +39,7 @@ export function install (Vue) {
         // vue/src/core/global-api/index.js
         Vue.util.defineReactive(this, '_route', this._router.history.current)
       } else {
-        // 没有就向上寻找 父级、父级的 _routerRoot
+        // 没有就赋值为父级的 _routerRoot 或者 this
         this._routerRoot = (this.$parent && this.$parent._routerRoot) || this
       }
       registerInstance(this, this)

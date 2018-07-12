@@ -51,6 +51,7 @@ export default {
       return h()
     }
 
+    // 命名视图
     // 根据 name 拿到 component 并存缓存到之前申明的 cache 中
     const component = cache[name] = matched.components[name]
 
@@ -70,7 +71,7 @@ export default {
       }
     }
 
-    // 预补丁生命周期钩子
+    // 增加 vnode 的预补丁生命周期钩子
     // also register instance in prepatch hook
     // in case the same component instance is reused across different routes
     ; (data.hook || (data.hook = {})).prepatch = (_, vnode) => {
@@ -78,6 +79,7 @@ export default {
     }
 
     // resolve props
+    // 处理有 routes 单个 props 的情况
     let propsToPass = data.props = resolveProps(route, matched.props && matched.props[name])
     if (propsToPass) {
       // clone to prevent mutation
@@ -96,6 +98,7 @@ export default {
   }
 }
 
+// 处理不同 route 格式
 function resolveProps (route, config) {
   switch (typeof config) {
     case 'undefined':
@@ -105,6 +108,7 @@ function resolveProps (route, config) {
     case 'function':
       return config(route)
     case 'boolean':
+      // 处理 props: true  return params
       return config ? route.params : undefined
     default:
       if (process.env.NODE_ENV !== 'production') {

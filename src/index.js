@@ -120,8 +120,12 @@ export default class VueRouter {
       const setupHashListener = () => {
         history.setupListeners()
       }
-      // 在 route 更新后再添加事件监听
-      // issues #725
+      /**
+       *  transitionTo 的 回调是在 route 更新后触发
+       *  所以是在 route 更新后再添加事件监听
+       *  防止 根目录情况下 连续触发 hashchange 事件
+       *  issues #725
+       */
       history.transitionTo(
         // HashHistory 类的 getHash 方法， 获取 hash 后的 url
         history.getCurrentLocation(),
@@ -132,6 +136,8 @@ export default class VueRouter {
 
     // issues #1110 #1108
     // 主要是为了修复多个vue实例 route 状态共享的问题
+    // 调用 History 类的 listen 方法 将传入的函数赋值给 this.cb
+    // 通过 updateRoute 方法调用 更新 route 触发 vue 的 set
     history.listen(route => {
       this.apps.forEach((app) => {
         app._route = route
