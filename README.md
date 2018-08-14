@@ -1,6 +1,6 @@
 # vue-router [![Build Status](https://img.shields.io/circleci/project/vuejs/vue-router/dev.svg)](https://circleci.com/gh/vuejs/vue-router)
 
-![梳理的思维导图](https://images-cdn.shimo.im/Y0ngDdIdZqU15ZbJ/Vue_router.png!original)
+![阅读 vue-router 源码的思维导图](https://images-cdn.shimo.im/gFfW8mk8XVoiiXvx/Vue_router.png!thumbnail)
 
 > This is vue-router 2.0 which works only with Vue 2.0. For the 1.x router see the [1.0 branch](https://github.com/vuejs/vue-router/tree/1.0).
 
