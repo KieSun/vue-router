@@ -42,6 +42,7 @@ export function resolvePath (
   return stack.join('/')
 }
 
+// 路径解析 path query hash
 export function parsePath (path: string): {
   path: string;
   query: string;
@@ -69,6 +70,7 @@ export function parsePath (path: string): {
   }
 }
 
+// 将 '//' 替换成 '/'
 export function cleanPath (path: string): string {
   return path.replace(/\/\//g, '/')
 }

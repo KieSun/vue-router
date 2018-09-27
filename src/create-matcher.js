@@ -17,8 +17,10 @@ export function createMatcher (
   routes: Array<RouteConfig>,
   router: VueRouter
 ): Matcher {
+  // 使用 createRouteMap 创建了 路径列表 路由路径表 和 路由名称表
   const { pathList, pathMap, nameMap } = createRouteMap(routes)
 
+  // 暴露给 Router实例 用来动态添加更多的路由规则
   function addRoutes (routes) {
     createRouteMap(routes, pathList, pathMap, nameMap)
   }
@@ -28,9 +30,19 @@ export function createMatcher (
     currentRoute?: Route,
     redirectedFrom?: Location
   ): Route {
+    /**
+     * normalizeLocation
+     *  return {
+     *    _normalized: true,
+     *    path || name,
+     *    query,
+     *    hash
+     *  }
+     */
     const location = normalizeLocation(raw, currentRoute, false, router)
     const { name } = location
 
+    // 路由名称表增加记录
     if (name) {
       const record = nameMap[name]
       if (process.env.NODE_ENV !== 'production') {
@@ -62,6 +74,7 @@ export function createMatcher (
       for (let i = 0; i < pathList.length; i++) {
         const path = pathList[i]
         const record = pathMap[path]
+        // 创建路由
         if (matchRoute(record.regex, location.path, location.params)) {
           return _createRoute(record, location, redirectedFrom)
         }
@@ -157,6 +170,7 @@ export function createMatcher (
     location: Location,
     redirectedFrom?: Location
   ): Route {
+    // 不同 类型 router 处理
     if (record && record.redirect) {
       return redirect(record, redirectedFrom || location)
     }

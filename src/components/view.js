@@ -23,6 +23,7 @@ export default {
 
     // determine current view depth, also check to see if the tree
     // has been toggled inactive but kept-alive.
+    // 深度记录
     let depth = 0
     let inactive = false
     while (parent && parent._routerRoot !== parent) {
@@ -41,6 +42,8 @@ export default {
       return h(cache[name], data, children)
     }
 
+    // matched 是一个扁平数组 储存从浅到深路由记录
+    // 这里用深度取出对应的 matched 路由记录
     const matched = route.matched[depth]
     // render empty node if no matched route
     if (!matched) {
@@ -48,10 +51,15 @@ export default {
       return h()
     }
 
+    // 命名视图
+    // 根据 name 拿到 component 并存缓存到之前申明的 cache 中
     const component = cache[name] = matched.components[name]
 
     // attach instance registration hook
     // this will be called in the instance's injected lifecycle hooks
+    // 将传入的 val 以 name 为 key 保存到 matched.instances
+    // 此时 val 为 vue 实例
+    // 调用此方法有两种情况 beforeCreate(vm,vm) destroyed(vm)
     data.registerRouteInstance = (vm, val) => {
       // val could be undefined for unregistration
       const current = matched.instances[name]
@@ -63,13 +71,15 @@ export default {
       }
     }
 
+    // 增加 vnode 的预补丁生命周期钩子
     // also register instance in prepatch hook
     // in case the same component instance is reused across different routes
-    ;(data.hook || (data.hook = {})).prepatch = (_, vnode) => {
+    ; (data.hook || (data.hook = {})).prepatch = (_, vnode) => {
       matched.instances[name] = vnode.componentInstance
     }
 
     // resolve props
+    // 处理有 routes 单个 props 的情况
     let propsToPass = data.props = resolveProps(route, matched.props && matched.props[name])
     if (propsToPass) {
       // clone to prevent mutation
@@ -88,6 +98,7 @@ export default {
   }
 }
 
+// 处理不同 route 格式
 function resolveProps (route, config) {
   switch (typeof config) {
     case 'undefined':
@@ -97,6 +108,7 @@ function resolveProps (route, config) {
     case 'function':
       return config(route)
     case 'boolean':
+      // 处理 props: true  return params
       return config ? route.params : undefined
     default:
       if (process.env.NODE_ENV !== 'production') {

@@ -28,15 +28,17 @@ export default {
       default: 'click'
     }
   },
-  render (h: Function) {
+  render(h: Function) {
     const router = this.$router
     const current = this.$route
+    // 解析跳转目标路径
     const { location, route, href } = router.resolve(this.to, current, this.append)
 
     const classes = {}
     const globalActiveClass = router.options.linkActiveClass
     const globalExactActiveClass = router.options.linkExactActiveClass
     // Support global empty active class
+    // 添加一些 class
     const activeClassFallback = globalActiveClass == null
       ? 'router-link-active'
       : globalActiveClass
@@ -60,6 +62,8 @@ export default {
 
     const handler = e => {
       if (guardEvent(e)) {
+        // 根据 this.props.append
+        // 判断是 replace 还是 push
         if (this.replace) {
           router.replace(location)
         } else {
@@ -69,6 +73,8 @@ export default {
     }
 
     const on = { click: guardEvent }
+    // 可配置的监听 event 事件 可以是数组
+    // 循环添加事件监听
     if (Array.isArray(this.event)) {
       this.event.forEach(e => { on[e] = handler })
     } else {
@@ -79,10 +85,13 @@ export default {
       class: classes
     }
 
+    // 判断当前元素是否是 a 标签
+    // 是则给自己添加 href 点击事件
     if (this.tag === 'a') {
       data.on = on
       data.attrs = { href }
     } else {
+      // 不是则递归向下寻找，找到就添加 href、监听事件
       // find the first <a> child and apply listener and href
       const a = findAnchor(this.$slots.default)
       if (a) {
@@ -93,16 +102,19 @@ export default {
         const aAttrs = a.data.attrs = extend({}, a.data.attrs)
         aAttrs.href = href
       } else {
+        // 找不到就给自己添加 href、监听事件
         // doesn't have <a> child, apply listener to self
         data.on = on
       }
     }
 
+    // 使用 createElement 创建 Vnode
+    // 并且将 slot 传入
     return h(this.tag, data, this.$slots.default)
   }
 }
 
-function guardEvent (e) {
+function guardEvent(e) {
   // don't redirect with control keys
   if (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) return
   // don't redirect when preventDefault called
@@ -121,7 +133,8 @@ function guardEvent (e) {
   return true
 }
 
-function findAnchor (children) {
+// 递归找到锚点并返回
+function findAnchor(children) {
   if (children) {
     let child
     for (let i = 0; i < children.length; i++) {
